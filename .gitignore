@@ -1,0 +1,41 @@
+# ── Virtual environment ──────────────────────────────
+venv/
+.venv/
+env/
+
+# ── Python cache ─────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+*.so
+
+# ── Large binary / generated data files ──────────────
+data/raw/          # raw CT-scan images — download separately
+*.npy              # preprocessed NumPy arrays (X_all, y_all, node splits)
+*.h5               # trained model weights
+*.hdf5
+*.pkl
+
+# ── Logs / results (optional — commit if small) ───────
+logs/
+# results/         # uncomment to exclude results JSON too
+
+# ── Editor & OS artifacts ─────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+*.code-workspace
+
+# ── Jupyter / Colab checkpoints ───────────────────────
+.ipynb_checkpoints/
+
+# ── Kaggle API credentials ────────────────────────────
+kaggle.json
+.kaggle/
