@@ -1,0 +1,115 @@
+{
+  "strategy": "FedAvg",
+  "num_rounds": 10,
+  "num_nodes": 3,
+  "local_epochs": 3,
+  "batch_size": 32,
+  "learning_rate": 0.001,
+  "fraction_train": 0.67,
+  "initial_test_accuracy": 0.3449999988079071,
+  "final_test_loss": 0.6119716763496399,
+  "final_test_accuracy": 0.8399999737739563,
+  "total_training_time_sec": 253.8,
+  "round_metrics": [
+    {
+      "round": 1,
+      "selected_nodes": [
+        1,
+        2
+      ],
+      "test_loss": 0.9087995290756226,
+      "test_accuracy": 0.675000011920929,
+      "round_time_sec": 26.4
+    },
+    {
+      "round": 2,
+      "selected_nodes": [
+        1,
+        2
+      ],
+      "test_loss": 0.5679768919944763,
+      "test_accuracy": 0.75,
+      "round_time_sec": 26.6
+    },
+    {
+      "round": 3,
+      "selected_nodes": [
+        1,
+        3
+      ],
+      "test_loss": 0.4866468906402588,
+      "test_accuracy": 0.800000011920929,
+      "round_time_sec": 25.5
+    },
+    {
+      "round": 4,
+      "selected_nodes": [
+        1,
+        3
+      ],
+      "test_loss": 0.5075806379318237,
+      "test_accuracy": 0.8100000023841858,
+      "round_time_sec": 23.6
+    },
+    {
+      "round": 5,
+      "selected_nodes": [
+        1,
+        2
+      ],
+      "test_loss": 0.4703308343887329,
+      "test_accuracy": 0.8349999785423279,
+      "round_time_sec": 24.4
+    },
+    {
+      "round": 6,
+      "selected_nodes": [
+        2,
+        3
+      ],
+      "test_loss": 0.38677144050598145,
+      "test_accuracy": 0.875,
+      "round_time_sec": 24.6
+    },
+    {
+      "round": 7,
+      "selected_nodes": [
+        1,
+        2
+      ],
+      "test_loss": 0.43663015961647034,
+      "test_accuracy": 0.8500000238418579,
+      "round_time_sec": 25.6
+    },
+    {
+      "round": 8,
+      "selected_nodes": [
+        2,
+        3
+      ],
+      "test_loss": 0.3743523061275482,
+      "test_accuracy": 0.8700000047683716,
+      "round_time_sec": 24.9
+    },
+    {
+      "round": 9,
+      "selected_nodes": [
+        1,
+        3
+      ],
+      "test_loss": 0.469819575548172,
+      "test_accuracy": 0.875,
+      "round_time_sec": 24.7
+    },
+    {
+      "round": 10,
+      "selected_nodes": [
+        1,
+        3
+      ],
+      "test_loss": 0.6119716763496399,
+      "test_accuracy": 0.8399999737739563,
+      "round_time_sec": 27.6
+    }
+  ]
+}
