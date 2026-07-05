@@ -100,13 +100,19 @@ Loss      : Sparse Categorical Crossentropy
 │   ├── preprocess.py          ← raw images → X_all.npy, y_all.npy
 │   ├── partition.py           ← IID split → node1/ node2/ node3/ test/
 │   └── train_centralized.py  ← centralized baseline training
+├── federated_learning/
+│   ├── __init__.py
+│   ├── task.py                ← data loading + model wrapper for FL
+│   ├── client_app.py          ← Flower ClientApp (runs on each node)
+│   ├── server_app.py          ← Flower ServerApp (FedAvg orchestration)
+│   └── pyproject.toml         ← Flower config + dependencies
 ├── data/
 │   ├── raw/                   ← place Kaggle images here (not committed)
 │   ├── node1/  node2/  node3/  test/   ← generated (not committed)
 │   ├── class_map.json
 │   └── download.md
-├── models/                    ← centralized_model.h5 (not committed — share via Drive)
-├── results/                   ← centralized_metrics.json
+├── models/                    ← centralized_model.h5, federated_model.h5 (not committed)
+├── results/                   ← centralized_metrics.json, fl_metrics.json
 ├── docs/
 │   └── architecture.png       ← full system architecture diagram
 ├── Chiranthan_Colab_Training.ipynb
@@ -114,6 +120,77 @@ Loss      : Sparse Categorical Crossentropy
 ├── setup.bat                  ← Windows bootstrap
 ├── requirements.txt
 └── .gitignore
+```
+
+---
+
+## Rohith's Component — Federated Learning (Flower)
+
+### What this component does
+
+```
+data/node1/  ──┐
+data/node2/  ──┼──►  Flower FL Simulation  ──►  models/federated_model.h5
+data/node3/  ──┘                               results/fl_metrics.json
+
+  Client 1      Client 2      Client 3
+  (node1/)      (node2/)      (node3/)
+      │             │             │
+      └──────┬──────┘             │
+             │  (2 of 3 selected) │
+             └──────────┬─────────┘
+                        │
+                        ▼
+                  ┌─────────────┐
+                  │ FedAvg      │
+                  │ (Server)    │
+                  │ averages    │
+                  │ weights     │
+                  └─────────────┘
+```
+
+The **federated model** should approach but not exceed the centralized baseline (88%). Each hospital node trains locally — only model weights are shared.
+
+### FL Files
+
+| File | Purpose |
+|------|---------|
+| `federated_learning/task.py` | Data loading + model wrapper |
+| `federated_learning/client_app.py` | Flower ClientApp (runs on each node) |
+| `federated_learning/server_app.py` | Flower ServerApp (coordinates FL) |
+| `federated_learning/pyproject.toml` | Flower config + dependencies |
+
+### FL Training Flow
+
+1. Server initializes a random CNN model
+2. Each round, server sends model to 2 randomly selected clients
+3. Each client trains on its local data (`data/node{X}/`)
+4. Clients send updated weights back to server
+5. Server averages weights (FedAvg)
+6. Repeat for 10 rounds (configurable)
+7. Final model saved as `models/federated_model.h5`
+
+### FL Results (Expected)
+
+| Metric | Centralized Baseline | FL Target |
+|--------|---------------------|-----------|
+| Test Accuracy | 88.00% | ~82-86% |
+| Strategy | N/A | FedAvg |
+| Clients/Round | N/A | 2 of 3 |
+| Rounds | N/A | 10 |
+
+### Running the FL Simulation
+
+```bash
+# Install dependencies (including Flower)
+pip install -r requirements.txt
+
+# Run FL simulation (from project root)
+cd federated_learning
+flwr run . --stream
+
+# Custom config (more rounds, different LR)
+flwr run . --run-config "num-server-rounds=15 learning-rate=0.0005"
 ```
 
 ---
@@ -154,7 +231,7 @@ python ml/train_centralized.py
 |----------|-------------|
 | **Rohith** (FL) | `data/node1/`, `node2/`, `node3/` + `ml/model.py` |
 | **Shree Gowda** (GAN) | `data/node1/`, `node2/`, `node3/` |
-| **Pavan** (Backend) | `models/centralized_model.h5` + `data/class_map.json` |
+| **Pavan** (Backend) | `models/federated_model.h5` + `data/class_map.json` |
 
 Share via Google Drive: `MyDrive/FL_Project/` folder.
 
@@ -163,12 +240,19 @@ Share via Google Drive: `MyDrive/FL_Project/` folder.
 ## Git Workflow
 
 ```bash
+# Chiranthan's branch
 git checkout -b chiranthan/data-cnn
 git add ml/ data/class_map.json data/download.md docs/
 git add requirements.txt .gitignore README.md setup.sh setup.bat
 git add Chiranthan_Colab_Training.ipynb
 git commit -m "feat: data pipeline + CNN baseline (88% test accuracy)"
 git push origin chiranthan/data-cnn
+
+# Rohith's branch
+git checkout -b rohith/federated-learning
+git add federated_learning/ requirements.txt README.md
+git commit -m "feat: FL client/server with FedAvg (Flower v1.x)"
+git push origin rohith/federated-learning
 ```
 
 > `*.npy` and `*.h5` are excluded by `.gitignore` — share large files via Google Drive.
