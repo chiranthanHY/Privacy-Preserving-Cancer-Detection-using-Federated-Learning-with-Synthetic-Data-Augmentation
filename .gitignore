@@ -14,15 +14,18 @@ build/
 *.so
 
 # ── Large binary / generated data files ──────────────
-data/raw/          # raw CT-scan images — download separately
-*.npy              # preprocessed NumPy arrays (X_all, y_all, node splits)
-*.h5               # trained model weights
+data/raw/
+*.npy
+*.h5
 *.hdf5
 *.pkl
+models/
+data-ml/
 
 # ── Logs / results (optional — commit if small) ───────
 logs/
-# results/         # uncomment to exclude results JSON too
+# results/
+
 
 # ── Editor & OS artifacts ─────────────────────────────
 .DS_Store

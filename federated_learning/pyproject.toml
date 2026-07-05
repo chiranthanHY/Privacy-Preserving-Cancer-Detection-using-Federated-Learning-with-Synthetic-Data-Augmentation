@@ -32,3 +32,6 @@ save-model = true
 [tool.flwr.federations]
 # Local simulation profile
 default = "local-simulation"
+
+[tool.flwr.federations.local-simulation]
+options.num-supernodes = 3
