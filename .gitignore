@@ -1,44 +1,10 @@
-# ── Virtual environment ──────────────────────────────
-venv/
-.venv/
-env/
-
-# ── Python cache ─────────────────────────────────────
+test_venv
+.git
 __pycache__/
-*.py[cod]
-*.pyo
-*.pyd
-*.egg-info/
-dist/
-build/
-*.so
-
-# ── Large binary / generated data files ──────────────
-data/raw/
-*.npy
-*.h5
-*.hdf5
-*.pkl
-models/
+.venv/
+data/
 data-ml/
-
-# ── Logs / results (optional — commit if small) ───────
-logs/
-# results/
-
-
-# ── Editor & OS artifacts ─────────────────────────────
-.DS_Store
-Thumbs.db
-*.swp
-*.swo
-.idea/
-.vscode/
-*.code-workspace
-
-# ── Jupyter / Colab checkpoints ───────────────────────
+models/
+dist/
+results/
 .ipynb_checkpoints/
-
-# ── Kaggle API credentials ────────────────────────────
-kaggle.json
-.kaggle/

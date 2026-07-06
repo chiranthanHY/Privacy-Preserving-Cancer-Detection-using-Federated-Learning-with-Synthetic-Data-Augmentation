@@ -13,11 +13,11 @@ import os
 import json
 from pprint import pprint
 
-from flwr.serverapp import ServerApp
+from flwr.serverapp import ServerApp, Grid
 from flwr.serverapp.strategy import FedAvg
-from flwr.app import ArrayRecord, Context, Grid, RecordDict
+from flwr.app import ArrayRecord, Context, RecordDict
 
-from task import load_model
+from .task import load_model
 
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODEL_DIR = os.path.join(_ROOT, "models")
