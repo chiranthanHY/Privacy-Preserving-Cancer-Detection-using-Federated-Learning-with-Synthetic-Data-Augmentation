@@ -99,25 +99,24 @@ Loss      : Sparse Categorical Crossentropy
 │   ├── explore_data.py        ← EDA: class counts, sample image grid
 │   ├── preprocess.py          ← raw images → X_all.npy, y_all.npy
 │   ├── partition.py           ← IID split → node1/ node2/ node3/ test/
-│   └── train_centralized.py  ← centralized baseline training
+│   ├── train_centralized.py   ← centralized baseline training
+│   └── train_federated.py     ← alternate FL training script
 ├── federated_learning/
 │   ├── __init__.py
 │   ├── task.py                ← data loading + model wrapper for FL
 │   ├── client_app.py          ← Flower ClientApp (runs on each node)
-│   ├── server_app.py          ← Flower ServerApp (FedAvg orchestration)
-│   └── pyproject.toml         ← Flower config + dependencies
+│   └── server_app.py          ← Flower ServerApp (FedAvg orchestration)
 ├── data/
 │   ├── raw/                   ← place Kaggle images here (not committed)
 │   ├── node1/  node2/  node3/  test/   ← generated (not committed)
-│   ├── class_map.json
-│   └── download.md
+│   └── class_map.json
 ├── models/                    ← centralized_model.h5, federated_model.h5 (not committed)
 ├── results/                   ← centralized_metrics.json, fl_metrics.json
 ├── docs/
 │   └── architecture.png       ← full system architecture diagram
-├── Chiranthan_Colab_Training.ipynb
-├── setup.sh                   ← Linux/macOS/Git Bash bootstrap
-├── setup.bat                  ← Windows bootstrap
+├── pyproject.toml             ← Flower config + dependencies
+├── Chiranthan_Colab_Training.ipynb  ← data pipeline + centralized CNN training
+├── FL_Training.ipynb          ← federated learning via Flower (Colab)
 ├── requirements.txt
 └── .gitignore
 ```
@@ -158,7 +157,7 @@ The **federated model** should approach but not exceed the centralized baseline 
 | `federated_learning/task.py` | Data loading + model wrapper |
 | `federated_learning/client_app.py` | Flower ClientApp (runs on each node) |
 | `federated_learning/server_app.py` | Flower ServerApp (coordinates FL) |
-| `federated_learning/pyproject.toml` | Flower config + dependencies |
+| `pyproject.toml` | Flower config + dependencies (project root) |
 
 ### FL Training Flow
 
@@ -186,11 +185,10 @@ The **federated model** should approach but not exceed the centralized baseline 
 pip install -r requirements.txt
 
 # Run FL simulation (from project root)
-cd federated_learning
-flwr run . --stream
+flwr run federated_learning --stream
 
 # Custom config (more rounds, different LR)
-flwr run . --run-config "num-server-rounds=15 learning-rate=0.0005"
+flwr run federated_learning --run-config "num-server-rounds=15 learning-rate=0.0005"
 ```
 
 ---
@@ -198,30 +196,41 @@ flwr run . --run-config "num-server-rounds=15 learning-rate=0.0005"
 ## Quick Start — Local
 
 ```bash
-# 1. Bootstrap (creates venv + installs deps + creates folders)
-./setup.sh          # Linux / macOS / Git Bash
-setup.bat           # Windows
-
-# 2. Activate venv
+# 1. Create virtual environment and install dependencies
+python -m venv venv
 source venv/bin/activate       # Linux/macOS
 venv\Scripts\activate          # Windows
+pip install -r requirements.txt
 
-# 3. Place dataset images in data/raw/<class_name>/
+# 2. Place dataset images in data/raw/<class_name>/
+#    Classes: adenocarcinoma, large.cell.carcinoma, squamous.cell.carcinoma, normal
 
-# 4. Run pipeline (from project root)
+# 3. Run data pipeline + centralized training (from project root)
 python ml/explore_data.py
 python ml/preprocess.py
 python ml/partition.py
 python ml/train_centralized.py
+
+# 4. Run federated learning
+flwr run federated_learning --stream
 ```
 
 ## Quick Start — Google Colab (GPU)
+
+### Data Pipeline + Centralized CNN
 
 1. Upload `Chiranthan_Colab_Training.ipynb` to [colab.research.google.com](https://colab.research.google.com)
 2. **Runtime → Change runtime type → T4 GPU**
 3. Place dataset in `MyDrive/Data/` (train/ valid/ test/ subfolders)
 4. Upload `.py` files to `MyDrive/FL_Project/`
 5. Run all cells top to bottom
+
+### Federated Learning (Flower)
+
+1. Upload `FL_Training.ipynb` to [colab.research.google.com](https://colab.research.google.com)
+2. **Runtime → Change runtime type → T4 GPU**
+3. Upload `ml/`, `federated_learning/`, and `data/` folders to `MyDrive/FL_Project/`
+4. Run all cells top to bottom
 
 ---
 
@@ -242,15 +251,15 @@ Share via Google Drive: `MyDrive/FL_Project/` folder.
 ```bash
 # Chiranthan's branch
 git checkout -b chiranthan/data-cnn
-git add ml/ data/class_map.json data/download.md docs/
-git add requirements.txt .gitignore README.md setup.sh setup.bat
-git add Chiranthan_Colab_Training.ipynb
+git add ml/ data/class_map.json docs/
+git add requirements.txt .gitignore README.md pyproject.toml
+git add Chiranthan_Colab_Training.ipynb FL_Training.ipynb
 git commit -m "feat: data pipeline + CNN baseline (88% test accuracy)"
 git push origin chiranthan/data-cnn
 
 # Rohith's branch
 git checkout -b rohith/federated-learning
-git add federated_learning/ requirements.txt README.md
+git add federated_learning/ pyproject.toml requirements.txt README.md
 git commit -m "feat: FL client/server with FedAvg (Flower v1.x)"
 git push origin rohith/federated-learning
 ```
