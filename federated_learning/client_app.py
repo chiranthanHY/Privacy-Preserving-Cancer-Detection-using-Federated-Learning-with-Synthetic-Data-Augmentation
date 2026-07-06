@@ -9,10 +9,10 @@ Each client:
 """
 import numpy as np
 import tensorflow as tf
-from flwr.client import ClientApp
+from flwr.clientapp import ClientApp
 from flwr.app import Message, Context, ArrayRecord, MetricRecord, RecordDict
 
-from task import load_data, load_model
+from .task import load_data, load_model
 
 
 def _set_seed(seed: int = 42):
