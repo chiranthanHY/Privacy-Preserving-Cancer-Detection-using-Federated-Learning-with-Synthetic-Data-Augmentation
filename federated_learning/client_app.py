@@ -29,12 +29,12 @@ def train(msg: Message, context: Context):
     """Train the model on local data and return updated weights."""
     _set_seed()
 
-    # Read config from pyproject.toml
-    partition_id = context.node_config["partition-id"]
-    num_partitions = context.node_config["num-partitions"]
-    learning_rate = context.run_config["learning-rate"]
-    local_epochs = context.run_config["local-epochs"]
-    batch_size = context.run_config["batch-size"]
+    # Read config from pyproject.toml (with defaults for direct simulation)
+    partition_id = context.node_config.get("partition-id", 0)
+    num_partitions = context.node_config.get("num-partitions", 3)
+    learning_rate = context.run_config.get("learning-rate", 0.001)
+    local_epochs = context.run_config.get("local-epochs", 3)
+    batch_size = context.run_config.get("batch-size", 32)
 
     print(f"\n[Client {partition_id}] Training on local data...")
 
@@ -80,9 +80,9 @@ def evaluate(msg: Message, context: Context):
     """Evaluate the model on local test data."""
     _set_seed()
 
-    partition_id = context.node_config["partition-id"]
-    num_partitions = context.node_config["num-partitions"]
-    learning_rate = context.run_config["learning-rate"]
+    partition_id = context.node_config.get("partition-id", 0)
+    num_partitions = context.node_config.get("num-partitions", 3)
+    learning_rate = context.run_config.get("learning-rate", 0.001)
 
     print(f"\n[Client {partition_id}] Evaluating on local data...")
 
