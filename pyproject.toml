@@ -6,9 +6,9 @@ build-backend = "hatchling.build"
 name = "cancer-detection-fl"
 version = "0.1.0"
 description = "Federated Learning for Privacy-Preserving Cancer Detection"
-requires-python = ">=3.9"
+requires-python = ">=3.10,<4.0"
 dependencies = [
-    "flwr>=1.26",
+    "flwr[simulation]>=1.26",
     "tensorflow>=2.13",
     "numpy>=1.24",
 ]
@@ -31,6 +31,7 @@ batch-size = 32
 learning-rate = 0.001
 fraction-train = 0.67  # 2 of 3 clients per round
 save-model = true
+
 
 
 
