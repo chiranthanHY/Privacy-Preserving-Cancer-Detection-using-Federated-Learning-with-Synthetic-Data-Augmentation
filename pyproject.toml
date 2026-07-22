@@ -1,0 +1,57 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "cancer-detection-fl"
+version = "0.1.0"
+description = "Federated Learning for Privacy-Preserving Cancer Detection"
+requires-python = ">=3.10,<4.0"
+dependencies = [
+    "flwr[simulation]>=1.26",
+    "tensorflow>=2.13",
+    "numpy>=1.24",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["federated_learning", "ml"]
+
+[tool.flwr.app]
+publisher = "Rohith"
+
+[tool.flwr.app.components]
+serverapp = "federated_learning.server_app:app"
+clientapp = "federated_learning.client_app:app"
+
+[tool.flwr.app.config]
+# FL training parameters
+num-server-rounds = 10
+local-epochs = 3
+batch-size = 32
+learning-rate = 0.001
+fraction-train = 0.67  # 2 of 3 clients per round
+save-model = true
+
+
+
+
+#######################################################################
+# CONFIGURATION MIGRATION NOTICE:
+#
+# What was previously called "federation config" for SuperLink
+# connections in pyproject.toml has been renamed and moved.
+#
+# These settings are now **SuperLink connection configuration**
+# and are defined in the Flower configuration file.
+#
+# The entries below are commented out intentionally and are kept
+# only as a migration reference.
+#
+# Docs: https://flower.ai/docs/framework/ref-flower-configuration.html
+#######################################################################
+
+# [tool.flwr.federations]
+# default = "local-simulation"
+
+# [tool.flwr.federations.local-simulation]
+# options.num-supernodes = 3
