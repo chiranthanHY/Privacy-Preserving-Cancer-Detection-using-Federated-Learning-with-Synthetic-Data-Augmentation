@@ -20,6 +20,34 @@ import json
 import time
 import numpy as np
 
+# ── Ensure GPU / CUDA libs are on LD_LIBRARY_PATH before importing TF ──────
+import glob
+venv_nvidia = os.path.join(os.path.dirname(sys.executable), "..", "lib", f"python{sys.version_info.major}.{sys.version_info.minor}", "site-packages", "nvidia")
+lib_dirs = glob.glob(f"{venv_nvidia}/*/lib")
+local_nvidia = os.path.expanduser("~/.local/lib/python3.14/site-packages/nvidia")
+lib_dirs += glob.glob(f"{local_nvidia}/*/lib")
+if lib_dirs:
+    existing_ld = os.environ.get("LD_LIBRARY_PATH", "")
+    os.environ["LD_LIBRARY_PATH"] = ":".join(lib_dirs) + (f":{existing_ld}" if existing_ld else "")
+    import ctypes
+    for d in lib_dirs:
+        for f in glob.glob(f"{d}/*.so*"):
+            try:
+                ctypes.CDLL(f)
+            except Exception:
+                pass
+
+import tensorflow as tf
+
+# Enable GPU memory growth so TensorFlow doesn't pre-allocate all GPU VRAM
+gpus = tf.config.list_physical_devices("GPU")
+if gpus:
+    for gpu in gpus:
+        try:
+            tf.config.experimental.set_memory_growth(gpu, True)
+        except Exception:
+            pass
+
 # ── Project paths ────────────────────────────────────────────────────────────
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.dirname(SCRIPT_DIR)
@@ -111,8 +139,10 @@ def train_client(node_id, global_weights):
 
     train_loss = history.history["loss"][-1]
     train_acc = history.history["accuracy"][-1]
+    weights = model.get_weights()
+    tf.keras.backend.clear_session()
 
-    return model.get_weights(), len(X_train), train_loss, train_acc
+    return weights, len(X_train), train_loss, train_acc
 
 
 def evaluate_global(global_weights, X_test, y_test):
@@ -120,6 +150,7 @@ def evaluate_global(global_weights, X_test, y_test):
     model = create_model()
     model.set_weights(global_weights)
     loss, acc = model.evaluate(X_test, y_test, verbose=0)
+    tf.keras.backend.clear_session()
     return loss, acc
 
 

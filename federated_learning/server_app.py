@@ -29,11 +29,11 @@ app = ServerApp()
 @app.main()
 def main(grid: Grid, context: Context) -> None:
     """Main entry point for the ServerApp."""
-    # Read config from pyproject.toml
-    num_rounds = context.run_config["num-server-rounds"]
-    fraction_train = context.run_config["fraction-train"]
-    save_model = context.run_config["save-model"]
-    learning_rate = context.run_config["learning-rate"]
+    # Read config from pyproject.toml (with defaults for direct simulation)
+    num_rounds = context.run_config.get("num-server-rounds", 10)
+    fraction_train = context.run_config.get("fraction-train", 0.67)
+    save_model = context.run_config.get("save-model", True)
+    learning_rate = context.run_config.get("learning-rate", 0.001)
 
     print("\n" + "=" * 60)
     print("  Federated Learning — Cancer Detection")
@@ -65,9 +65,10 @@ def main(grid: Grid, context: Context) -> None:
     print("  FL Training Complete")
     print("=" * 60)
 
-    if hasattr(result, "metrics") and result.metrics:
-        print("\nFinal server-side metrics:")
-        pprint(result.metrics)
+    if result.train_metrics_clientapp:
+        print("\nFinal training metrics (aggregated across clients):")
+        last_round = max(result.train_metrics_clientapp.keys())
+        pprint(result.train_metrics_clientapp[last_round])
 
     # Save final model
     if save_model:
@@ -86,8 +87,18 @@ def main(grid: Grid, context: Context) -> None:
             "fraction_train": fraction_train,
             "learning_rate": learning_rate,
         }
-        if hasattr(result, "metrics") and result.metrics:
-            metrics_data["final_metrics"] = result.metrics
+        if result.train_metrics_clientapp:
+            metrics_data["train_metrics"] = {
+                str(k): {mk: float(mv) if isinstance(mv, (int, float)) else str(mv)
+                         for mk, mv in v.items()}
+                for k, v in result.train_metrics_clientapp.items()
+            }
+        if result.evaluate_metrics_clientapp:
+            metrics_data["evaluate_metrics"] = {
+                str(k): {mk: float(mv) if isinstance(mv, (int, float)) else str(mv)
+                         for mk, mv in v.items()}
+                for k, v in result.evaluate_metrics_clientapp.items()
+            }
         with open(metrics_path, "w") as f:
             json.dump(metrics_data, f, indent=2)
         print(f"Saved metrics to {metrics_path}")
